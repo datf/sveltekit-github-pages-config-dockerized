@@ -41,6 +41,6 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/datf/sveltekit-github-pages-config-dockerized.git"
+		"url": "git+https://github.com/datf/sveltekit-github-pages-config-dockerized.git"
 	}
 }
