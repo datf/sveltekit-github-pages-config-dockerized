@@ -19,21 +19,19 @@ export default defineAddon({
 				compilerOptions: js.object.create({
 					css: 'injected'
 				}),
-				kit: js.object.create({
-					output: js.object.create({
-						bundleStrategy: 'inline'
-					}),
-					paths: js.object.create({
-						base: js.common.parseExpression(`process.argv.includes('dev') ? '' : process.env.BASE_PATH`),
-					}),
-					adapter: js.common.parseExpression(`adapter({
-							fallback: '404.html',
-							pages: 'build',
-							assets: 'build',
-							precompress: false,
-							strict: true
-						})`)
+				output: js.object.create({
+					bundleStrategy: 'inline'
 				}),
+				paths: js.object.create({
+					base: js.common.parseExpression(`process.argv.includes('dev') ? '' : process.env.BASE_PATH`),
+				}),
+				adapter: js.common.parseExpression(`adapter({
+						fallback: '404.html',
+						pages: 'build',
+						assets: 'build',
+						precompress: false,
+						strict: true
+					})`)
 			});
 		});
 
