@@ -1,5 +1,5 @@
 import { defineAddon, defineAddonOptions } from 'sv';
-import { transforms } from './sv-utils.js';
+import { transforms, svelteConfig } from './sv-utils.js';
 
 const options = defineAddonOptions()
 	.build();
@@ -12,43 +12,30 @@ export default defineAddon({
 		if (!isKit) unsupported('Requires SvelteKit');
 	},
 
-	run: ({ sv, file, language }) => {
-		sv.file(
-			'svelte.config.js',
-			transforms.script(({ ast, js }) => {
-				js.imports.addNamed(ast, {
-					imports: ["vitePreprocess"],
-					from: "@sveltejs/vite-plugin-svelte"
-				});
-
-				const { value: config } = js.exports.createDefault(ast);
-				js.object.overrideProperties(config, {
-					preprocess: js.functions.createCall({
-						name: 'vitePreprocess',
-						args: []
-					}),
-					compilerOptions: js.object.create({
-						css: 'injected'
-					}),
+	run: ({ sv, file, language, cwd }) => {
+		svelteConfig.edit({ sv, cwd }, ({ ast, override, js }) => {
+			const { value: config } = js.exports.createDefault(ast);
+			override({
+				compilerOptions: js.object.create({
+					css: 'injected'
+				}),
+				kit: js.object.create({
 					output: js.object.create({
 						bundleStrategy: 'inline'
-					}),
-					kit: js.object.create({
-						adapter: js.common.parseExpression(`adapter({
-								fallback: '404.html',
-								pages: 'build',
-								assets: 'build',
-								precompress: false,
-								strict: true
-							})`)
 					}),
 					paths: js.object.create({
 						base: js.common.parseExpression(`process.argv.includes('dev') ? '' : process.env.BASE_PATH`),
 					}),
-				});
-
-			})
-		);
+					adapter: js.common.parseExpression(`adapter({
+							fallback: '404.html',
+							pages: 'build',
+							assets: 'build',
+							precompress: false,
+							strict: true
+						})`)
+				}),
+			});
+		});
 
 		sv.file(
 			file.viteConfig,
